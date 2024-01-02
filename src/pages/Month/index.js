@@ -1,6 +1,6 @@
 import { NavBar, DatePicker } from 'antd-mobile'
 import './index.scss'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import classNames from 'classnames'
 import dayjs from 'dayjs'
 import { useSelector } from 'react-redux'
@@ -38,7 +38,15 @@ const Month = () => {
         return dayjs(new Date()).format('YYYY-MM')
     })
 
-    const onConfirm = (date) => {
+    // used to render data at initializing phrase
+    useEffect(() => {
+        const latestMonth = dayjs(new Date()).format('YYYY-MM')
+        if (monthDetailGroup && monthDetailGroup[latestMonth]) {
+            setCurrentMonthBillList(monthDetailGroup[latestMonth])
+        }
+    }, [monthDetailGroup])
+
+    const onConfirm = (date) => { 
         setDateVisible(false)
          
         const formatDate = dayjs(date).format('YYYY-MM')
@@ -51,14 +59,14 @@ const Month = () => {
   return (
     <div className="monthlyBill">
       <NavBar className="nav" backArrow={false}>
-        月度收支
+        Monthly Income and Expenses
       </NavBar>
       <div className="content">
         <div className="header">
           {/* 时间切换区域 */}
           <div className="date" onClick={() => setDateVisible(true)}>
             <span className="text">
-              {currentDate + ''}月账单
+              {currentDate + ''} Month Bill
             </span>
             {/* 思路：根据当前弹框打开的状态控制expand类名是否存在 */}
             <span className={classNames('arrow', dateVisible && 'expand')}></span>
@@ -67,15 +75,15 @@ const Month = () => {
           <div className='twoLineOverview'>
             <div className="item">
               <span className="money">{currentMonthStastic.pay.toFixed(2)}</span>
-              <span className="type">支出</span>
+              <span className="type">spend</span>
             </div>
             <div className="item">
               <span className="money">{currentMonthStastic.income.toFixed(2)}</span>
-              <span className="type">收入</span>
+              <span className="type">income</span>
             </div>
             <div className="item">
               <span className="money">{currentMonthStastic.total.toFixed(2)}</span>
-              <span className="type">结余</span>
+              <span className="type">balance</span>
             </div>
           </div>
           {/* 时间选择器 */}
