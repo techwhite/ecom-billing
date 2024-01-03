@@ -1,8 +1,8 @@
 import classNames from 'classnames'
 import './index.scss'
 import { useMemo, useState } from 'react'
-import Icon from '../Icon/index'
-import { billTypeToName } from '../../../../constants/index'
+import { billTypeToName } from '../../../../constants'
+import Icon from '../../../../components/Icon'
 
 const DailyBill = ({date, dayBillList}) => {
 
