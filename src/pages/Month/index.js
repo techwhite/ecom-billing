@@ -5,6 +5,7 @@ import classNames from 'classnames'
 import dayjs from 'dayjs'
 import { useSelector } from 'react-redux'
 import _ from 'lodash'
+import DailyBill from './components/DayBill'
 
 const Month = () => {  
     const { billList } = useSelector(state => state.billList ? state.billList : [])
@@ -56,53 +57,71 @@ const Month = () => {
         }
     }
 
-  return (
-    <div className="monthlyBill">
-      <NavBar className="nav" backArrow={false}>
-        Monthly Income and Expenses
-      </NavBar>
-      <div className="content">
-        <div className="header">
-          {/* 时间切换区域 */}
-          <div className="date" onClick={() => setDateVisible(true)}>
-            <span className="text">
-              {currentDate + ''} Month Bill
-            </span>
-            {/* 思路：根据当前弹框打开的状态控制expand类名是否存在 */}
-            <span className={classNames('arrow', dateVisible && 'expand')}></span>
-          </div>
-          {/* 统计区域 */}
-          <div className='twoLineOverview'>
-            <div className="item">
-              <span className="money">{currentMonthStastic.pay.toFixed(2)}</span>
-              <span className="type">spend</span>
-            </div>
-            <div className="item">
-              <span className="money">{currentMonthStastic.income.toFixed(2)}</span>
-              <span className="type">income</span>
-            </div>
-            <div className="item">
-              <span className="money">{currentMonthStastic.total.toFixed(2)}</span>
-              <span className="type">balance</span>
-            </div>
-          </div>
-          {/* 时间选择器 */}
-          <DatePicker
-            className="kaDate"
-            title="BillDate"
-            precision="month"
-            visible={dateVisible}
-            onCancel={() => setDateVisible(false)}
-            onConfirm={onConfirm}
-            onClose={() => setDateVisible(false)}
-            max={new Date()} 
-          />
-        </div>
-        {/* 单日列表统计 */}
 
-      </div>
-    </div >
-  )
+    // group current month's data by day
+    const dayGroup = useMemo(() => {
+        const dayGroupData = _.groupBy(currentMonthBillList, item => dayjs(item.date).format('YYYY-MM-DD'))
+        const keys = Object.keys(dayGroupData)
+        
+        return {
+            keys,
+            dayGroupData
+        }
+    }, [currentMonthBillList])
+
+
+    return (
+        <div className="monthlyBill">
+        <NavBar className="nav" backArrow={false}>
+            Monthly Income and Expenses
+        </NavBar>
+        <div className="content">
+            <div className="header">
+            {/* 时间切换区域 */}
+            <div className="date" onClick={() => setDateVisible(true)}>
+                <span className="text">
+                {currentDate + ''} Month Bill
+                </span>
+                {/* 思路：根据当前弹框打开的状态控制expand类名是否存在 */}
+                <span className={classNames('arrow', dateVisible && 'expand')}></span>
+            </div>
+            {/* 统计区域 */}
+            <div className='twoLineOverview'>
+                <div className="item">
+                <span className="money">{currentMonthStastic.pay.toFixed(2)}</span>
+                <span className="type">Expenses</span>
+                </div>
+                <div className="item">
+                <span className="money">{currentMonthStastic.income.toFixed(2)}</span>
+                <span className="type">Income</span>
+                </div>
+                <div className="item">
+                <span className="money">{currentMonthStastic.total.toFixed(2)}</span>
+                <span className="type">Balance</span>
+                </div>
+            </div>
+            {/* 时间选择器 */}
+            <DatePicker
+                className="kaDate"
+                title="BillDate"
+                precision="month"
+                visible={dateVisible}
+                onCancel={() => setDateVisible(false)}
+                onConfirm={onConfirm}
+                onClose={() => setDateVisible(false)}
+                max={new Date()} 
+            />
+            </div>
+            {/* daily bill list */}
+            {
+                dayGroup.keys.map(key => {
+                    return <DailyBill key={key} date={key} dayBillList = {dayGroup.dayGroupData[key]} />
+                })
+            }
+
+        </div>
+        </div >
+    )
 }
 
 export default Month
